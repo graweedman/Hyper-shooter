@@ -4,6 +4,7 @@ extends CharacterBody3D
 @onready var head = $neck/head 
 @onready var eyes = $neck/head/eyes
 @onready var camera = $neck/head/eyes/camera
+@onready var animation_player = $neck/head/eyes/animation_player
 @onready var grapple_raycast = $neck/head/eyes/camera/grapple_cast
 @onready var standing_collision_shape = $standing_collision_shape
 @onready var crouching_collision_shape = $crouching_collision_shape
@@ -28,6 +29,7 @@ const MOUSE_SENSITIVITY = 0.4
 var current_speed = 5.0
 var direction = Vector3.ZERO
 var crouching_depth = -0.9
+var last_velocity = Vector3.ZERO
 
 # sliding variables
 var slide_timer = 0.0
@@ -124,6 +126,13 @@ func _physics_process(delta):
 			velocity.y -= gravity * delta
 
 	
+	#Handle landing
+	if is_on_floor():
+		if last_velocity.y < -10.0:
+			animation_player.play("roll")
+		elif last_velocity.y < -4.0:
+			animation_player.play("landing")
+		
 	
 
 	# Handle Free Look.
@@ -176,6 +185,7 @@ func _physics_process(delta):
 	if Input.is_action_just_pressed("ui_accept") && is_on_floor():
 		velocity.y = JUMP_VELOCITY
 		sliding = false
+		animation_player.play("jump")
 
 	if sliding:
 		direction = (transform.basis * Vector3(slide_vector.x, 0, slide_vector.y)).normalized()
@@ -187,31 +197,15 @@ func _physics_process(delta):
 	# else:
 		# velocity.x = move_toward(velocity.x, 0, current_speed)
 		# velocity.z = move_toward(velocity.z, 0, current_speed)
+
+		last_velocity = velocity
 	move_and_slide()
 
+	
 
 
-func grapple():
-	if Input.is_action_just_pressed("grapple"):
-		print("grapple")
-		if grapple_raycast.is_colliding():
-			if not grappling:
-				grappling = true
-	if head_bonk_raycast.is_colliding():
-		grappling = false
-		grappling_get = false
-		grappling_point = null
-		
-	if grappling:
-		if not grappling_get:
-			grappling_point = grapple_raycast.get_collision_point() + Vector3(0, 1, 0)
-			grappling_get = true
-		if grappling_point.distance_to(position) > 2:
-			position = lerp(position, grappling_point, 0.05)
-		else:
-			grappling = false
-			grappling_get = false
-			grappling_point = Vector2.ZERO
+
+
 			
 func player_state(state):
 	match state:

@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://cknrx81bppg7m"]
+[gd_scene load_steps=17 format=3 uid="uid://cknrx81bppg7m"]
 
 [ext_resource type="Texture2D" uid="uid://c1aymk5myvdmo" path="res://hdris/skybox.png" id="1_f46t3"]
 [ext_resource type="Texture2D" uid="uid://dt0jpnqdfs2k3" path="res://textures/dev/grids/Dark/texture_07.png" id="3_keywv"]
-[ext_resource type="Script" path="res://player.gd" id="4_0c8y4"]
+[ext_resource type="Script" path="res://Scripts/player.gd" id="4_0c8y4"]
+[ext_resource type="Script" path="res://Scripts/grappling_hook.gd" id="4_mtrpv"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_a8a2j"]
 panorama = ExtResource("1_f46t3")
@@ -30,6 +31,125 @@ height = 1.75
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_50qvd"]
 radius = 0.25
 height = 0.980241
+
+[sub_resource type="Animation" id="Animation_uxhmn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("camera:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("camera:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_s7k4i"]
+resource_name = "jump"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("camera:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 0.176777, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.0349066, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("camera:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, -0.1, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_4087h"]
+resource_name = "landing"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("camera:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 5.65685, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.0523599, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("camera:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, -0.1, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_pg6yy"]
+resource_name = "roll"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("camera:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-1.5708, 0, 0), Vector3(-3.14159, 0, 0), Vector3(-4.71239, 0, 0), Vector3(-6.28319, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("camera:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, -0.5, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_t5tl5"]
+_data = {
+"RESET": SubResource("Animation_uxhmn"),
+"jump": SubResource("Animation_s7k4i"),
+"landing": SubResource("Animation_4087h"),
+"roll": SubResource("Animation_pg6yy")
+}
 
 [node name="Node3D" type="Node3D"]
 
@@ -66,7 +186,7 @@ size = Vector3(20, 1, 20)
 material = SubResource("StandardMaterial3D_gujsi")
 
 [node name="player" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.97518)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 5.97518)
 collision_mask = 2
 script = ExtResource("4_0c8y4")
 
@@ -102,6 +222,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 
 [node name="camera" type="Camera3D" parent="player/neck/head/eyes"]
 
-[node name="grapple_cast" type="RayCast3D" parent="player/neck/head/eyes/camera"]
+[node name="grappling_hook" type="RayCast3D" parent="player/neck/head/eyes/camera"]
 target_position = Vector3(0, 0, -10)
 collision_mask = 2
+script = ExtResource("4_mtrpv")
+
+[node name="animation_player" type="AnimationPlayer" parent="player/neck/head/eyes"]
+libraries = {
+"": SubResource("AnimationLibrary_t5tl5")
+}
